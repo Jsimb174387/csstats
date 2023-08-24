@@ -2,7 +2,7 @@ import json
 import os
 import requests
 from PIL import Image
-
+import hashtoicon
 from icon import display, serve_pil_image
 from flask import Flask, render_template
 
@@ -16,10 +16,9 @@ def home():
     return render_template('home.html')
 
 
-@app.route("/image")
-def serve_img():
-    return display("RevolutionCase",
-                   "https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXU5A1PIYQNqhpOSV-fRPasw8rsUFJ5KBFZv668FFQynaHMJT9B74-ywtjYxfOmMe_Vx28AucQj3brAoYrz3Fay_kY4MG_wdYeLMlhpLMaM-1U")
+@app.route("/image/<markethash>")
+def serve_img(markethash):
+    return display(hashtoicon.getIcon(markethash))
 
 
 @app.route('/data')
@@ -43,8 +42,10 @@ def market(start, end, amount):
     # m_start="skinport", m_end="buff163"):
     info = json.dumps(check_report(m_start=str(start), m_end=str(end))[0:int(amount)])
     # return str(check_report(m_start=str(start), m_end=str(end))[0:int(amount)])
-    return info
-
+    hashlist = []
+    for item in json.loads(info):
+        hashlist.append(item)
+    return display(hashtoicon.getmanyIcons(hashlist))
 
 @app.route('/market/<item_name>')
 def item_info(item_name):
